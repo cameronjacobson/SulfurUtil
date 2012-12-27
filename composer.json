@@ -1,0 +1,12 @@
+{
+	"require": {
+		"symfony/console": "2.2.*@dev",
+		"twig/twig": "1.*"
+	},
+	"autoload": {
+		"psr-0": {
+			"Sulfur": "vendor/Sulfur/src",
+			"SulfurUtil": "src/"
+		}
+	}
+}
