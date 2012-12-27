@@ -1,0 +1,16 @@
+#!/usr/bin/php
+<?php
+/**
+ *  This starts up a REPL
+ *    Until 'help' command is added, look in CLI.php for full list of commands.
+ *
+ *  type:  'exit' to close REPL
+ */
+
+$argv[1] = 'Sulfur:CLI';
+
+require_once('vendor/autoload.php');
+
+use SulfurUtil\SulfurUtil;
+$a = new SulfurUtil($argv);
+var_dump($a);
