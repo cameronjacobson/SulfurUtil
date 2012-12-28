@@ -7,7 +7,9 @@
  *  type:  'exit' to close REPL
  */
 
-require_once(dirname(__DIR__).'/vendor/autoload.php');
+define('SULFUR_UTIL_DIR',dirname(__DIR__));
+
+require_once(SULFUR_UTIL_DIR.'/vendor/autoload.php');
 
 use SulfurUtil\SulfurUtil;
 $a = new SulfurUtil($argv);

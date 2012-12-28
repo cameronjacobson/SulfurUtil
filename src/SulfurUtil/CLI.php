@@ -12,6 +12,7 @@ use \SulfurUtil\Interfaces\CommandInterface;
 
 class CLI extends ConsoleCommand
 {
+	protected $validOptions = ['host','port','mapping','index','debug','basepath'];
 	protected function configure()
 	{
 		$this
@@ -44,6 +45,18 @@ class CLI extends ConsoleCommand
 				'Which elasticsearch index?'
 			)
 			->addOption(
+				'basepath',
+				'b',
+				InputOption::VALUE_REQUIRED,
+				'Where are relevant templates/etc?'
+			)
+			->addOption(
+				'config',
+				'c',
+				InputOption::VALUE_REQUIRED,
+				'Which config file contains all settings?'
+			)
+			->addOption(
 				'debug',
 				'd',
 				InputOption::VALUE_NONE,
@@ -55,21 +68,42 @@ class CLI extends ConsoleCommand
 	{
 		define('DEBUG_MODE',$input->getOption('debug'));
 		$context = new SulfurContext();
-		$context->host = $input->getOption('host');
-		$context->port = $input->getOption('port');
-		$context->mapping = $input->getOption('mapping');
-		$context->index = $input->getOption('index');
+		if($configfile = $input->getOption('config')){
+			$configfile = strpos($configfile,'/') === 0 ? $configfile : SULFUR_UTIL_DIR.'/'.$configfile;
+			$options = parse_ini_file($configfile,true);
+			foreach($options['SulfurUtil'] as $key=>$value){
+				if(in_array($key,$this->validOptions)){
+					switch($key){
+						case 'basepath':
+							$context->basepath = strpos($value,'/') === 0 ? $value : SULFUR_UTIL_DIR.'/'.$value;
+							break;
+						default:
+							$context->$key = $value;
+							break;
+					}
+				}
+			}
+var_dump($configfile);
+var_dump($context->basepath);
+var_dump($options);
+		}
+		else {
+			$context->host = $input->getOption('host');
+			$context->port = $input->getOption('port');
+			$context->mapping = $input->getOption('mapping');
+			$context->index = $input->getOption('index');
+			$context->basepath = $input->getOption('basepath');
+		}
 
 		do{
 			$command = null;
-			$output->write('<fg=yellow>sulfur > </fg=yellow>');
+			$output->write('<fg=yellow>sulfur >> </fg=yellow>');
 			$in = fgets(STDIN,1024);
 			$arguments = $this->parseCommand($in);
-//			$cmd = array_shift($arguments);
 
 			switch($cmd = array_shift($arguments)){
 				case 'exit':
-					die('you exited'.PHP_EOL);
+					die('Goodbye!'.PHP_EOL);
 					break;
 				case 'edit':
 					$a = `echo "# Enter your command:\n" | vipe | tee`;
@@ -103,6 +137,21 @@ class CLI extends ConsoleCommand
 				case 'json':
 					$command = new Command\Json($arguments,$context);
 					break;
+				case 'host':
+					$command = new Command\Host($arguments,$context);
+					break;
+				case 'port':
+					$command = new Command\Port($arguments,$context);
+					break;
+				case 'mapping':
+					$command = new Command\Mapping($arguments,$context);
+					break;
+				case 'basepath':
+					$command = new Command\BasePath($arguments,$context);
+					break;
+				case 'index':
+					$command = new Command\Index($arguments,$context);
+					break;
 				case '{apicall}':
 					break;
 				default:
@@ -130,7 +179,6 @@ class CLI extends ConsoleCommand
 					break;
 				default:
 					$tmp = trim($token[1]," \t\n\r\0\x0B");
-
 					if(strpos($tmp,'"') === 0){
 						$tmp = trim($tmp,'"');
 					}
@@ -139,7 +187,7 @@ class CLI extends ConsoleCommand
 					}
 
 					if(!empty($tmp)){
-						$components[] = $tmp;//trim($token[1]," \t\n\r\0\x0B\"'");
+						$components[] = $tmp;
 					}
 					break;
 			}

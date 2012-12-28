@@ -4,7 +4,7 @@ namespace SulfurUtil\Command;
 
 use SulfurUtil\Interfaces\CommandInterface;
 
-class Set implements CommandInterface
+class Port implements CommandInterface
 {
 	public function __construct($arguments, $context){
 		$this->arguments = $arguments;
@@ -13,11 +13,11 @@ class Set implements CommandInterface
 
 	public function execute(){
 		switch(count($this->arguments)){
-			case 2:
-				$this->context->request[$this->arguments[0]] = $this->arguments[1];
+			case 0:
+				return $this->context->port;
 				break;
-			case 3:
-				$this->context->query[$this->arguments[1]] = $this->arguments[2];
+			case 1:
+				$this->context->port = $this->arguments[0];
 				break;
 			default:
 				return false;
@@ -27,11 +27,9 @@ class Set implements CommandInterface
 
 	public function isValid(){
 		switch(count($this->arguments)){
-			case 2:
+			case 0:
+			case 1:
 				return true;
-				break;
-			case 3:
-				return $this->arguments[0] === 'query';
 				break;
 			default:
 				return false;
@@ -40,6 +38,6 @@ class Set implements CommandInterface
 	}
 
 	public function getHelp(){
-		return 'Usage: set [query] {key} {value}';
+		return 'Usage: port [value]';
 	}
 }

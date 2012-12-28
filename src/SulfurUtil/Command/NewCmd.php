@@ -6,20 +6,32 @@ use SulfurUtil\Interfaces\CommandInterface;
 
 class NewCmd implements CommandInterface
 {
+	protected $validCommands = ['context','query'];
+
 	public function __construct($arguments, $context){
 		$this->arguments = $arguments;
-		$this->context = $context;
+		$this->context = &$context;
 	}
 
 	public function execute(){
-		return 'this is class: '.__CLASS__;
+		switch($this->what){
+			case 'context':
+				$this->context->clear();
+				break;
+			case 'query':
+				$this->context->query = [];
+				break;
+		}
 	}
 
 	public function isValid(){
-		return true;
+		if(in_array($this->what = array_shift($this->arguments),$this->validCommands)){
+			return true;
+		}
+		return false;
 	}
 
 	public function getHelp(){
-		return 'this is help';
+		return 'Usage: new [context|query]';
 	}
 }
