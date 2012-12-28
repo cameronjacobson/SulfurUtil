@@ -7,8 +7,6 @@
  *  type:  'exit' to close REPL
  */
 
-$argv[1] = 'Sulfur:CLI';
-
 require_once('vendor/autoload.php');
 
 use SulfurUtil\SulfurUtil;

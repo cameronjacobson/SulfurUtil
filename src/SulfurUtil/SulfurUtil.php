@@ -10,6 +10,10 @@ use \Symfony\Component\Console\Output\ConsoleOutput;
 class SulfurUtil
 {
 	public function __construct($argv){
+		$arg = array_shift($argv);
+		array_unshift($argv,'Sulfur:CLI');
+		array_unshift($argv,$arg);
+
 		$input = new ArgvInput($argv);
 		$output = new ConsoleOutput();
 
