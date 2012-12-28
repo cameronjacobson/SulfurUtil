@@ -2,14 +2,15 @@
 
 namespace SulfurUtil;
 
-use \Symfony\Component\Console\Command\Command;
+use \Symfony\Component\Console\Command\Command as ConsoleCommand;
 use \Symfony\Component\Console\Input\InputArgument;
 use \Symfony\Component\Console\Input\InputInterface;
 use \Symfony\Component\Console\Input\InputOption;
 use \Symfony\Component\Console\Output\OutputInterface;
 use \Sulfur\SulfurContext;
+use \SulfurUtil\Interfaces\CommandInterface;
 
-class CLI extends Command
+class CLI extends ConsoleCommand
 {
 	protected function configure()
 	{
@@ -60,12 +61,13 @@ class CLI extends Command
 		$context->index = $input->getOption('index');
 
 		do{
+			$command = null;
 			$output->write('<fg=yellow>sulfur > </fg=yellow>');
-			$cmd = fgets(STDIN,1024);
-			$arguments = $this->parseCommand($cmd);
-			$command = array_shift($arguments);
-			$command = trim($command);
-			switch($command){
+			$in = fgets(STDIN,1024);
+			$arguments = $this->parseCommand($in);
+//			$cmd = array_shift($arguments);
+
+			switch($cmd = array_shift($arguments)){
 				case 'exit':
 					die('you exited'.PHP_EOL);
 					break;
@@ -74,49 +76,48 @@ class CLI extends Command
 					$output->write($a);
 					break;
 				case 'new':// context,query
-					$context = new SulfurContext();
-					$output->writeln('You said: '.$command);
+					$command = new Command\NewCmd($arguments,$context);
+					//$context = new SulfurContext();
 					break;
 				case 'delete':// query
-					$output->writeln('You said: '.$command);
+					$command = new Command\Delete($arguments,$context);
 					break;
 				case 'get': // query
-					$output->writeln('You said: '.$command);
+					$command = new Command\Get($arguments,$context);
 					break;
 				case 'set': // query
-					$output->writeln('You said: '.$command);
+					$command = new Command\Set($arguments,$context);
 					break;
-				case 'show': // url,{apicall}
-					$output->writeln('You said: '.$command);
+				case 'show': // template,url,{apicall}
+					$command = new Command\Show($arguments,$context);
 					break;
 				case 'help': // {apicall}
-					$output->writeln('You said: '.$command);
+					$command = new Command\Help($arguments,$context);
 					break;
 				case 'load': // template
-					$output->writeln('You said: '.$command);
-					break;
-				case 'show':// template
-					$output->writeln('You said: '.$command);
+					$command = new Command\Load($arguments,$context);
 					break;
 				case 'parse': // template
-					$output->writeln('You said: '.$command);
-					break;
-				case '{apicall}':
-					$output->writeln('You said: '.$command);
+					$command = new Command\Parse($arguments,$context);
 					break;
 				case 'json':
-					$output->writeln('You said: '.$command);
+					$command = new Command\Json($arguments,$context);
+					break;
+				case '{apicall}':
 					break;
 				default:
-					$output->writeln('You said: '.$command);
+					$output->writeln('Invalid Command: '.$cmd);
 					break;
 			}
-if(DEBUG_MODE){
-			$output->writeln('ARGUMENTS:');
-			foreach($arguments as $v){
-				$output->writeln("\t".$v);
+			if(DEBUG_MODE){
+				$output->writeln('ARGUMENTS:');
+				foreach($arguments as $v){
+					$output->writeln("\t".$v);
+				}
 			}
-}
+			if(!empty($command)){
+				$output->writeln($this->processCommand($command));
+			}
 		} while(true);
 	}
 	protected function parseCommand($cmd){
@@ -144,5 +145,14 @@ if(DEBUG_MODE){
 			}
 		}
 		return $components;
+	}
+
+	protected function processCommand(CommandInterface $command){
+		if($command->isValid()){
+			return $command->execute();
+		}
+		else {
+			return $command->getHelp();
+		}
 	}
 }
