@@ -15,7 +15,7 @@ class Delete implements CommandInterface
         switch(count($this->arguments)){
             case 1:
                 unset($this->context->request[$this->arguments[0]]);
-				return 'OK';
+				return '<fg=green>OK</fg=green>';
                 break;
             case 2:
                 unset($this->context->query[$this->arguments[1]]);
@@ -41,7 +41,11 @@ class Delete implements CommandInterface
         }
     }
 
+    public function getDescription(){
+        return 'command description here';
+    }
+
     public function getHelp(){
-        return 'Usage: delete [query] {key}';
+        return 'delete [query] {key}';
     }
 }

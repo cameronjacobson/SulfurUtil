@@ -7,5 +7,6 @@ interface CommandInterface
 	public function __construct($arguments,$context);
 	public function isValid();
 	public function getHelp();
+	public function getDescription();
 	public function execute();
 }

@@ -31,7 +31,11 @@ class NewCmd implements CommandInterface
 		return false;
 	}
 
+    public function getDescription(){
+        return 'command description here';
+    }
+
 	public function getHelp(){
-		return 'Usage: new [context|query]';
+		return 'new [context|query]';
 	}
 }

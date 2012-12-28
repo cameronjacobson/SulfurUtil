@@ -39,7 +39,11 @@ class BasePath implements CommandInterface
 		}
 	}
 
+	public function getDescription(){
+		return 'command description here';
+	}
+
 	public function getHelp(){
-		return 'Usage: basepath [value]';
+		return 'basepath [value]';
 	}
 }

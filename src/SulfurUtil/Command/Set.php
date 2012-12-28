@@ -39,7 +39,11 @@ class Set implements CommandInterface
 		}
 	}
 
+    public function getDescription(){
+        return 'command description here';
+    }
+
 	public function getHelp(){
-		return 'Usage: set [query] {key} {value}';
+		return 'set [query] {key} {value}';
 	}
 }

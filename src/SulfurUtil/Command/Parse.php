@@ -19,6 +19,10 @@ class Parse implements CommandInterface
 		return true;
 	}
 
+    public function getDescription(){
+        return 'command description here';
+    }
+
 	public function getHelp(){
 		return 'this is help';
 	}
